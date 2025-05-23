@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成语接龙 - 小学五年级语文游戏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4A6FA5',
+                        secondary: '#E07A5F',
+                        accent: '#F4F1DE',
+                        dark: '#3D405B',
+                        light: '#F2CC8F',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            }
+            .btn-pulse {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(224, 122, 95, 0.7);
+                }
+                70% {
+                    box-shadow: 0 0 0 10px rgba(224, 122, 95, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(224, 122, 95, 0);
+                }
+            }
+            .progress-bar {
+                transition: width 0.5s ease-in-out;
+            }
+            .bounce-in {
+                animation: bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            @keyframes bounce-in {
+                0% {
+                    transform: scale(0.3);
+                    opacity: 0;
+                }
+                50% {
+                    transform: scale(1.05);
+                    opacity: 0.9;
+                }
+                70% {
+                    transform: scale(0.9);
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-accent to-light min-h-screen font-sans">
+    <!-- 顶部导航 -->
+    <header class="bg-primary text-white shadow-md fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-book-open text-2xl text-light"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-shadow">成语接龙</h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#" class="hover:text-light transition-colors duration-300">首页</a>
+                <a href="#" class="hover:text-light transition-colors duration-300">成语学习</a>
+                <a href="#" class="hover:text-light transition-colors duration-300">排行榜</a>
+                <a href="#" class="hover:text-light transition-colors duration-300">关于我们</a>
+            </div>
+            <button class="md:hidden text-xl">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 欢迎页面 -->
+        <section id="welcome-screen" class="flex flex-col items-center justify-center min-h-[70vh]">
+            <div class="text-center mb-10">
+                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 bounce-in">欢迎来到成语接龙游戏</h2>
+                <p class="text-lg md:text-xl text-dark/80 max-w-2xl mx-auto mb-8">
+                    锻炼你的成语词汇量，挑战不同难度的成语接龙关卡！
+                </p>
+                <img src="https://picsum.photos/id/20/600/300" alt="成语接龙" class="rounded-lg shadow-lg mb-8 max-w-full h-auto object-cover">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+                <div class="bg-white rounded-xl shadow-lg p-6 card-hover border-2 border-primary">
+                    <div class="text-primary text-3xl mb-4">
+                        <i class="fa-solid fa-child"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-2">简单模式</h3>
+                    <p class="text-dark/70 mb-4">组成6个成语，适合初学者</p>
+                    <button id="easy-btn" class="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        开始游戏
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 card-hover border-2 border-secondary">
+                    <div class="text-secondary text-3xl mb-4">
+                        <i class="fa-solid fa-teenager"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-2">中等模式</h3>
+                    <p class="text-dark/70 mb-4">组成10个成语，适合进阶学习者</p>
+                    <button id="medium-btn" class="w-full bg-secondary hover:bg-secondary/90 text-white py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        开始游戏
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 card-hover border-2 border-dark">
+                    <div class="text-dark text-3xl mb-4">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-2">困难模式</h3>
+                    <p class="text-dark/70 mb-4">组成14个成语，挑战你的极限</p>
+                    <button id="hard-btn" class="w-full bg-dark hover:bg-dark/90 text-white py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        开始游戏
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 游戏页面 -->
+        <section id="game-screen" class="hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div class="mb-4 md:mb-0">
+                        <h2 class="text-2xl font-bold text-dark mb-2">成语接龙游戏</h2>
+                        <div class="flex items-center text-dark/70">
+                            <span id="current-level" class="font-medium">简单模式</span>
+                            <span class="mx-2">•</span>
+                            <span>已完成：<span id="completed-count">0</span>/<span id="total-count">6</span></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center bg-accent/50 rounded-full px-4 py-2">
+                            <i class="fa-solid fa-clock text-dark/70 mr-2"></i>
+                            <span id="timer" class="font-medium">00:00</span>
+                        </div>
+                        <button id="hint-btn" class="bg-light hover:bg-light/80 text-dark font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center">
+                            <i class="fa-solid fa-lightbulb mr-2"></i> 提示
+                        </button>
+                        <button id="exit-btn" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center">
+                            <i class="fa-solid fa-door-open mr-2"></i> 退出
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                        <div id="progress-bar" class="bg-primary h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-dark mb-4">当前成语</h3>
+                    <div class="flex justify-center mb-6">
+                        <div id="current-idiom" class="text-3xl md:text-4xl font-bold text-primary bg-accent/30 py-4 px-8 rounded-lg inline-block">
+                            一马当先
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-dark mb-4">请输入以 <span id="first-character" class="text-secondary">先</span> 开头的成语</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="user-input" placeholder="请输入成语" class="flex-grow py-3 px-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300 text-lg">
+                        <button id="submit-btn" class="bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> 提交
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-dark mb-4">成语接龙记录</h3>
+                    <div id="idiom-history" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <!-- 成语历史记录将在这里动态生成 -->
+                    </div>
+                </div>
+                
+                <div id="feedback" class="hidden mb-6 p-4 rounded-lg transition-all duration-300"></div>
+            </div>
+        </section>
+
+        <!-- 结果页面 -->
+        <section id="result-screen" class="hidden flex flex-col items-center justify-center min-h-[70vh]">
+            <div id="success-result" class="text-center mb-10 hidden">
+                <div class="text-6xl text-green-500 mb-4">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold text-dark mb-4">恭喜你！挑战成功！</h2>
+                <p class="text-lg md:text-xl text-dark/80 max-w-2xl mx-auto mb-6">
+                    你已经成功完成了<span id="result-level" class="font-bold">简单</span>模式的成语接龙挑战！
+                </p>
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto mb-8">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-primary mb-2">6</div>
+                            <div class="text-dark/70">完成成语数</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-secondary mb-2" id="result-time">00:45</div>
+                            <div class="text-dark/70">用时</div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-dark/70">你的表现</span>
+                            <span class="font-medium">90分</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-green-500 h-2.5 rounded-full" style="width: 90%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="play-again-btn" class="bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        再玩一次
+                    </button>
+                    <button id="select-level-btn" class="bg-light hover:bg-light/80 text-dark py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        选择其他难度
+                    </button>
+                </div>
+            </div>
+            
+            <div id="fail-result" class="text-center mb-10 hidden">
+                <div class="text-6xl text-red-500 mb-4">
+                    <i class="fa-solid fa-times-circle"></i>
+                </div>
+                <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold text-dark mb-4">挑战失败！</h2>
+                <p class="text-lg md:text-xl text-dark/80 max-w-2xl mx-auto mb-6">
+                    再接再厉，你已经很接近完成<span id="fail-level" class="font-bold">简单</span>模式的成语接龙挑战了！
+                </p>
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto mb-8">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-primary mb-2">4</div>
+                            <div class="text-dark/70">已完成成语</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-secondary mb-2" id="fail-time">00:32</div>
+                            <div class="text-dark/70">用时</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="try-again-btn" class="bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        再试一次
+                    </button>
+                    <button id="back-btn" class="bg-light hover:bg-light/80 text-dark py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        返回主页
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center justify-center md:justify-start">
+                        <i class="fa-solid fa-book-open text-xl text-light mr-2"></i>
+                        <span class="text-lg font-bold">成语接龙</span>
+                    </div>
+                    <p class="text-white/70 text-center md:text-left mt-2">
+                        小学五年级语文学习游戏
+                    </p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-white/70 hover:text-light transition-colors duration-300">
+                        <i class="fa-brands fa-weixin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-white/70 hover:text-light transition-colors duration-300">
+                        <i class="fa-brands fa-weibo text-xl"></i>
+                    </a>
+                    <a href="#" class="text-white/70 hover:text-light transition-colors duration-300">
+                        <i class="fa-brands fa-qq text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-white/20 mt-6 pt-6 text-center text-white/50 text-sm">
+                © 2025 成语接龙游戏 版权所有
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 成语数据库
+        const idiomDatabase = [
+            { word: "一马当先", pinyin: "yī mǎ dāng xiān", explanation: "原指作战时策马冲锋在前。形容领先。也比喻工作走在群众前面，积极带头。" },
+            { word: "先声夺人", pinyin: "xiān shēng duó rén", explanation: "先张扬自己的声势以压倒对方。也比喻做事抢先一步。" },
+            { word: "人定胜天", pinyin: "rén dìng shèng tiān", explanation: "指人力能够战胜自然。" },
+            { word: "天衣无缝", pinyin: "tiān yī wú fèng", explanation: "神话传说，仙女的衣服没有衣缝。比喻事物周密完善，找不出什么毛病。" },
+            { word: "缝衣浅带", pinyin: "féng yī qiǎn dài", explanation: "宽袖大带是古代儒者的服饰，借指儒者。" },
+            { word: "带月披星", pinyin: "dài yuè pī xīng", explanation: "形容早起晚睡，奔波不息。" },
+            { word: "星罗棋布", pinyin: "xīng luó qí bù", explanation: "像天空的星星和棋盘上的棋子那样分布着。形容数量很多，分布很广。" },
+            { word: "布鼓雷门", pinyin: "bù gǔ léi mén", explanation: "在雷门前击布鼓。比喻在能手面前卖弄本领。" },
+            { word: "门庭若市", pinyin: "mén tíng ruò shì", explanation: "门前和院子里人很多，像市场一样。原形容进谏的人很多。现形容来的人很多，非常热闹。" },
+            { word: "市道之交", pinyin: "shì dào zhī jiāo", explanation: "指买卖双方之间的关系。比喻人与人之间以利害关系为转移的交情。" },
+            { word: "交头接耳", pinyin: "jiāo tóu jiē ěr", explanation: "形容两个人凑近低声交谈。" },
+            { word: "耳濡目染", pinyin: "ěr rú mù rǎn", explanation: "耳朵经常听到，眼睛经常看到，不知不觉地受到影响。" },
+            { word: "染苍染黄", pinyin: "rǎn cāng rǎn huáng", explanation: "苍：青色。比喻变化不定，反复无常。" },
+            { word: "黄粱一梦", pinyin: "huáng liáng yī mèng", explanation: "黄粱：小米。比喻虚幻不能实现的梦想。" },
+            { word: "梦笔生花", pinyin: "mèng bǐ shēng huā", explanation: "比喻写作能力大有进步。也形容文章写得很出色。" },
+            { word: "花红柳绿", pinyin: "huā hóng liǔ lǜ", explanation: "形容明媚的春天景象。也形容颜色鲜艳纷繁。" },
+            { word: "绿林好汉", pinyin: "lù lín hǎo hàn", explanation: "指聚集山林反抗封建统治阶级的人们。旧时也指聚众行劫的群盗股匪。" },
+            { word: "汉官威仪", pinyin: "hàn guān wēi yí", explanation: "原指汉朝官吏的服饰制度。后常指汉族的统治制度。" },
+            { word: "仪静体闲", pinyin: "yí jìng tǐ xián", explanation: "形容女子态度文静，体貌素雅。" },
+            { word: "闲情逸致", pinyin: "xián qíng yì zhì", explanation: "逸：安闲；致：情趣。指悠闲的心情和安逸的兴致。" },
+            { word: "致远任重", pinyin: "zhì yuǎn rèn zhòng", explanation: "指担负重任而行于远方。常比喻人的才干卓越，可任大事。亦作“任重致远”。" },
+            { word: "重见天日", pinyin: "chóng jiàn tiān rì", explanation: "重新看到了天和太阳。比喻脱离黑暗，重见光明。" },
+            { word: "日理万机", pinyin: "rì lǐ wàn jī", explanation: "理：处理，办理；万机：种种事务。形容政务繁忙，工作辛苦。" },
+            { word: "机变如神", pinyin: "jī biàn rú shén", explanation: "机变：机智、权变。机智权变，神奇莫测。" },
+            { word: "神工鬼斧", pinyin: "shén gōng guǐ fǔ", explanation: "象是鬼神制作出来的。形容艺术技艺高超，不像是人力所能达到的。" },
+            { word: "斧破斨缺", pinyin: "fǔ pò qiāng quē", explanation: "斨：古代一种斧子。指武器破损残缺。" },
+            { word: "缺衣少食", pinyin: "quē yī shǎo shí", explanation: "衣食不足。指贫穷。亦作“缺食无衣”。" },
+            { word: "食言而肥", pinyin: "shí yán ér féi", explanation: "食言：失信。指不守信用，只图自己占便宜。" },
+            { word: "肥马轻裘", pinyin: "féi mǎ qīng qiú", explanation: "裘：皮衣。骑肥壮的马，穿轻暖的皮衣。形容阔绰。" },
+            { word: "裘弊金尽", pinyin: "qiú bì jīn jìn", explanation: "皮袍破了，钱用完了。比喻境况困难。" },
+            { word: "尽善尽美", pinyin: "jìn shàn jìn měi", explanation: "极其完善，极其美好。指完美无缺。" },
+            { word: "美中不足", pinyin: "měi zhōng bù zú", explanation: "大体很好，但还有不足。" },
+            { word: "足智多谋", pinyin: "zú zhì duō móu", explanation: "足：充实，足够；智：聪明、智慧；谋：计谋。富有智慧，善于谋划。形容人善于料事和用计。" },
+            { word: "谋财害命", pinyin: "móu cái hài mìng", explanation: "为了劫夺财物，害人性命。" },
+            { word: "命在旦夕", pinyin: "mìng zài dàn xī", explanation: "旦夕：早晚之间，形容极短的时间。生命垂危，很快会失去生命。" },
+            { word: "夕惕若厉", pinyin: "xī tì ruò lì", explanation: "夕：傍晚；惕：小心谨慎；若：如；厉：危。到了夜晚，还是谨慎戒惧，如同遇到危险一样。表示时时刻刻小心谨慎。" },
+            { word: "厉兵秣马", pinyin: "lì bīng mò mǎ", explanation: "厉：同“砺”，磨；兵：兵器；秣：喂牲口。磨好兵器，喂好马。形容准备战斗。" },
+            { word: "马首是瞻", pinyin: "mǎ shǒu shì zhān", explanation: "瞻：往前或向上看。看着我马头的方向，决定进退。比喻追随某人行动。" },
+            { word: "瞻前顾后", pinyin: "zhān qián gù hòu", explanation: "瞻：向前看；顾：回头看。看看前面，又看看后面。形容做事之前考虑周密慎重。也形容顾虑太多，犹豫不决。" },
+            { word: "后起之秀", pinyin: "hòu qǐ zhī xiù", explanation: "后来出现的或新成长起来的优秀人物。" },
+            { word: "秀外慧中", pinyin: "xiù wài huì zhōng", explanation: "秀：秀丽；慧：联盟。外表秀丽，内心聪明。" },
+            { word: "中流砥柱", pinyin: "zhōng liú dǐ zhù", explanation: "就像屹立在黄河急流中的砥柱山一样。比喻坚强独立的人能在动荡艰难的环境中起支柱作用。" },
+            { word: "柱天踏地", pinyin: "zhù tiān tà dì", explanation: "指顶天立地的事物。" },
+            { word: "地大物博", pinyin: "dì dà wù bó", explanation: "博：丰富。指国家疆土辽阔，资源丰富。" },
+            { word: "博古通今", pinyin: "bó gǔ tōng jīn", explanation: "通：通晓；博：广博，知道得多。对古代的事知道得很多，并且通晓现代的事情。形容知识丰富。" },
+            { word: "今是昨非", pinyin: "jīn shì zuó fēi", explanation: "现在是对的，过去是错的。指认识过去的错误。" },
+            { word: "非分之想", pinyin: "fēi fèn zhī xiǎng", explanation: "非分：不属自己分内的。妄想得到本分以外的好处。" },
+            { word: "想入非非", pinyin: "xiǎng rù fēi fēi", explanation: "非非：原为佛家语，表示虚幻的境界。想到非常玄妙虚幻的地方去了。形容完全脱离现实地胡思乱想。" },
+            { word: "非亲非故", pinyin: "fēi qīn fēi gù", explanation: "故：老友。不是亲属，也不是熟人。表示彼此没有什么关系。" },
+            { word: "故弄玄虚", pinyin: "gù nòng xuán xū", explanation: "故：故意；弄：玩弄；玄虚：用来掩盖真相，使人迷惑的欺骗手段。故意玩弄花招，迷惑人，欺骗人。" },
+            { word: "虚怀若谷", pinyin: "xū huái ruò gǔ", explanation: "虚：谦虚；谷：山谷。胸怀象山谷一样深广。形容十分谦虚，能容纳别人的意见。" },
+            { word: "谷贱伤农", pinyin: "gǔ jiàn shāng nóng", explanation: "谷：粮食。指粮价过低，使农民受到损害。" },
+            { word: "农隙讲武", pinyin: "nóng xì jiǎng wǔ", explanation: "农隙：空隙时间。在农闲时讲习武事。" },
+            { word: "武不善作", pinyin: "wǔ bù shàn zuò", explanation: "意思是既动武就不能讲斯文。" },
+            { word: "作壁上观", pinyin: "zuò bì shàng guān", explanation: "壁：壁垒。原指双方交战，自己站在壁垒上旁观。后多比喻站在一旁看着，不动手帮助。" },
+            { word: "观过知仁", pinyin: "guān guò zhī rén", explanation: "察看一个人所犯过错的性质，就可以了解他的为人。" },
+            { word: "仁至义尽", pinyin: "rén zhì yì jìn", explanation: "至：极，最；尽：全部用出。竭尽仁义之道。指人的善意和帮助已经做到了最大限度。" },
+            { word: "尽人皆知", pinyin: "jìn rén jiē zhī", explanation: "尽：全部，所有。人人都知道。" },
+            { word: "知书达理", pinyin: "zhī shū dá lǐ", explanation: "知、达：懂得。有文化，讲道理。形容有教养。" },
+            { word: "理屈词穷", pinyin: "lǐ qū cí qióng", explanation: "屈：短，亏；穷：尽。由于理亏而无话可说。" },
+            { word: "穷途末路", pinyin: "qióng tú mò lù", explanation: "穷途：处境困窘。形容到了无路可走的地步。" },
+            { word: "路不拾遗", pinyin: "lù bù shí yí", explanation: "遗：失物。路上没有人把别人丢失的东西捡走。形容社会风气好。" },
+            { word: "遗臭万年", pinyin: "yí chòu wàn nián", explanation: "遗臭：死后留下的恶名。坏名声流传下去，永远被人所唾骂。" },
+            { word: "年逾古稀", pinyin: "nián yú gǔ xī", explanation: "指年龄已超过七十岁。" },
+            { word: "稀世之宝", pinyin: "xī shì zhī bǎo", explanation: "稀世：世所稀有。世上稀有的珍宝。" },
+            { word: "宝气珠光", pinyin: "bǎo qì zhū guāng", explanation: "形容各种珍贵装饰品的光泽和色彩。" },
+            { word: "光怪陆离", pinyin: "guāng guài lù lí", explanation: "光怪：光彩奇异；陆离：开卷参差。形容奇形怪状，五颜六色。" },
+            { word: "离经叛道", pinyin: "lí jīng pàn dào", explanation: "离：背离，不遵守。原指违反封建统治阶级所尊奉的经典和教条。现泛指背离占主导地位的理论或学说。" },
+            { word: "道听途说", pinyin: "dào tīng tú shuō", explanation: "道、途：路。路上听来的、路上传播的话。泛指没有根据的传闻。" },
+            { word: "说三道四", pinyin: "shuō sān dào sì", explanation: "形容不负责任地胡乱议论。" },
+            { word: "四海为家", pinyin: "sì hǎi wéi jiā", explanation: "原指帝王占有全国。后指什么地方都可以当作自己的家。指志在四方，不留恋家乡或个人小天地。" },
+            { word: "家徒四壁", pinyin: "jiā tú sì bì", explanation: "徒：只，仅仅。家里只有四面的墙壁。形容十分贫困，一无所有。" },
+            { word: "壁立千仞", pinyin: "bì lì qiān rèn", explanation: "壁立：峭壁陡立。形容岩石高耸。" },
+            { word: "仞古流芳", pinyin: "rèn gǔ liú fāng", explanation: "指好的名声永远流传下去。" },
+            { word: "芳兰竟体", pinyin: "fāng lán jìng tǐ", explanation: "芳兰：兰草的香气；竟体：满身。香气满身。比喻举止闲雅，风采极佳。" },
+            { word: "体国经野", pinyin: "tǐ guó jīng yě", explanation: "体：划分；国：都城；经：丈量；野：田野。旧时指治理国家。" },
+            { word: "野鹤孤云", pinyin: "yě hè gū yún", explanation: "比喻无拘无束、来去自如的人。" },
+            { word: "云程万里", pinyin: "yún chéng wàn lǐ", explanation: "云程：青云万里的路程。比喻前程远大。" },
+            { word: "里应外合", pinyin: "lǐ yìng wài hé", explanation: "应：接应；合：配合。外面攻打，里面接应。" },
+            { word: "合浦珠还", pinyin: "hé pǔ zhū huán", explanation: "合浦：汉代郡名，在今广西合浦县东北。比喻东西失而复得或人去而复回。" },
+            { word: "还淳返朴", pinyin: "huán chún fǎn pǔ", explanation: "回复到人本来的淳厚、朴实的状态或本性。" },
+            { word: "朴讷诚笃", pinyin: "pǔ nè chéng dǔ", explanation: "为人朴实敦厚，不善言词。" },
+            { word: "笃学好古", pinyin: "dǔ xué hào gǔ", explanation: "笃学：专心好学。指专心致至地学习古代曲籍。" },
+            { word: "古色古香", pinyin: "gǔ sè gǔ xiāng", explanation: "形容器物书画等富有古雅的色彩和情调。" },
+            { word: "香车宝马", pinyin: "xiāng chē bǎo mǎ", explanation: "华丽的车子，珍贵的宝马。指考究的车骑。" },
+            { word: "马不停蹄", pinyin: "mǎ bù tíng tí", explanation: "比喻不停顿地向前走。" },
+            { word: "蹄间三寻", pinyin: "tí jiàn sān xún", explanation: "指马奔走时，前后蹄间一跃而过三寻。形容马奔跑得快。" },
+            { word: "寻根究底", pinyin: "xún gēn jiū dǐ", explanation: "追求根底。一般指追问一件事的原由。" },
+            { word: "底死谩生", pinyin: "dǐ sǐ màn shēng", explanation: "底：通“抵”。竭尽全力，想尽办法。" },
+            { word: "生花妙笔", pinyin: "shēng huā miào bǐ", explanation: "比喻杰出的写作才能。" },
+            { word: "笔走龙蛇", pinyin: "bǐ zǒu lóng shé", explanation: "形容书法生动而有气势。" },
+            { word: "蛇欲吞象", pinyin: "shé yù tūn xiàng", explanation: "蛇想吞下大象。比喻贪欲极大。" },
+            { word: "象齿焚身", pinyin: "xiàng chǐ fén shēn", explanation: "焚身：丧生。象因为有珍贵的牙齿而遭到捕杀。比喻人因为有钱财或有才能而招灾。" },
+            { word: "身先士卒", pinyin: "shēn xiān shì zú", explanation: "作战时将领亲自带头，冲在士兵前面。现在也用来比喻领导带头，走在群众前面。" },
+            { word: "卒章显志", pinyin: "zú zhāng xiǎn zhì", explanation: "卒章：篇章结尾；显：表明。在文章结尾时，用一两句话点明主题，抒发立意。" },
+            { word: "志大才疏", pinyin: "zhì dà cái shū", explanation: "疏：粗疏，薄弱。指人志向大而才具不够。" },
+            { word: "疏而不漏", pinyin: "shū ér bù lòu", explanation: "意思是天道公平，作恶就要受惩罚，它看起来似乎很不周密，但最终不会放过一个坏人。比喻作恶的人逃脱不了国法的惩处。" },
+            { word: "漏网之鱼", pinyin: "lòu wǎng zhī yú", explanation: "逃脱鱼网的鱼。比喻侥幸逃脱的罪犯或敌人。" },
+            { word: "鱼目混珠", pinyin: "yú mù hùn zhū", explanation: "混：搀杂，冒充。拿鱼眼睛冒充珍珠。比喻用假的冒充真的。" },
+            { word: "珠圆玉润", pinyin: "zhū yuán yù rùn", explanation: "润：细腻光滑。象珠子一样圆，象玉石一样光润。比喻歌声宛转优美，或文字流畅明快。" },
+            { word: "润屋润身", pinyin: "rùn wū rùn shēn", explanation: "后用为恭贺新屋落成的题辞。" },
+            { word: "身经百战", pinyin: "shēn jīng bǎi zhàn", explanation: "亲身经历过很多次战斗。比喻况历多，经验丰富。" },
+            { word: "战天斗地", pinyin: "zhàn tiān dòu dì", explanation: "战、斗：泛指斗争。形容征服和改造大自然的英雄气慨。" },
+            { word: "地动山摇", pinyin: "dì dòng shān yáo", explanation: "地震发生时大地颤动，山河摇摆。亦形容声势浩大或斗争激烈。" },
+            { word: "摇旗呐喊", pinyin: "yáo qí nà hǎn", explanation: "原指古代作战时摇着旗子，大声喊杀助威。现比喻给别人助长声势。" },
+            { word: "喊冤叫屈", pinyin: "hǎn yuān jiào qū", explanation: "为遭受冤屈而喊叫。" },
+            { word: "屈打成招", pinyin: "qū dǎ chéng zhāo", explanation: "屈：冤枉；招：招供。指无罪的人冤枉受刑，被迫招认有罪。" },
+            { word: "招兵买马", pinyin: "zhāo bīng mǎi mǎ", explanation: "旧时指组织或扩充武装力量。后比喻组织或扩充人力。" },
+            { word: "马首欲东", pinyin: "mǎ shǒu yù dōng", explanation: "指东归；返回。" },
+            { word: "东张西望", pinyin: "dōng zhāng xī wàng", explanation: "张：看。形容这里那里地到处看。" },
+            { word: "望穿秋水", pinyin: "wàng chuān qiū shuǐ", explanation: "秋水：比喻人的眼睛。眼睛都望穿了。形容对远地亲友的殷切盼望。" },
+            { word: "水到渠成", pinyin: "shuǐ dào qú chéng", explanation: "渠：水道。水流到的地方自然形成一条水道。比喻条件成熟，事情自然会成功。" },
+            { word: "成仁取义", pinyin: "chéng rén qǔ yì", explanation: "成仁：杀身以成仁德；取义：舍弃生命以取得正义。为正义而牺牲生命。" },
+            { word: "义愤填膺", pinyin: "yì fèn tián yīng", explanation: "义愤：对违反正义的事情所产生的愤怒；膺：胸。发于正义的愤懑充满胸中。" },
+            { word: "膺箓受图", pinyin: "yīng lù shòu tú", explanation: "道教指经过修炼，受天地道箓而名列仙籍。也指帝王得受图箓，应运而兴。" },
+            { word: "图穷匕见", pinyin: "tú qióng bǐ xiàn", explanation: "图：地图；穷：尽；见：现。比喻事情发展到最后，真相或本意显露了出来。" },
+            { word: "见微知著", pinyin: "jiàn wēi zhī zhù", explanation: "微：隐约；著：明显。见到事情的苗头，就能知道它的实质和发展趋势。" },
+            { word: "著书立说", pinyin: "zhù shū lì shuō", explanation: "著：写作；立：成就；说：学说。写书或文章，创立自己的学说。" },
+            { word: "说一不二", pinyin: "shuō yī bù èr", explanation: "说怎么样就怎么样。形容说话算数。" },
+            { word: "二龙戏珠", pinyin: "èr lóng xì zhū", explanation: "两条龙相对，戏玩着一颗宝珠。" },
+            { word: "珠联璧合", pinyin: "zhū lián bì hé", explanation: "璧：平圆形中间有孔的玉。珍珠联串在一起，美玉结合在一块。比喻杰出的人才或美好的事物结合在一起。" },
+            { word: "合浦还珠", pinyin: "hé pǔ huán zhū", explanation: "比喻东西失而复得或人去而复回。" },
+            { word: "珠沉玉碎", pinyin: "zhū chén yù suì", explanation: "比喻美女的死亡。" },
+            { word: "碎琼乱玉", pinyin: "suì qióng luàn yù", explanation: "指雪花。" },
+            { word: "玉液琼浆", pinyin: "yù yè qióng jiāng", explanation: "琼：美玉。用美玉制成的浆液，古代传说饮了它可以成仙。比喻美酒或甘美的浆汁。" },
+            { word: "浆酒霍肉", pinyin: "jiāng jiǔ huò ròu", explanation: "把酒肉当作水浆、豆叶一样。形容饮食的奢侈。" },
+            { word: "肉袒面缚", pinyin: "ròu tǎn miàn fù", explanation: "肉袒：去衣露体，表示愿受责罚；面缚：两手反绑面对胜利者，表示放弃抵抗。脱去上衣，反缚着手。形容顺从投降。" },
+            { word: "缚鸡之力", pinyin: "fù jī zhī lì", explanation: "捆鸡的力量。比喻力量很小。" },
+            { word: "力透纸背", pinyin: "lì tòu zhǐ bèi", explanation: "透：穿过。形容书法刚劲有力，笔锋简直要透到纸张背面。也形容诗文立意深刻，词语精练。" },
+            { word: "背道而驰", pinyin: "bèi dào ér chí", explanation: "背：背向；道：道路；驰：奔跑。朝相反的方向跑去。比喻彼此的方向和目的完全相反。" },
+            { word: "驰风骋雨", pinyin: "chí fēng chěng yǔ", explanation: "犹言乘风驾雨。" },
+            { word: "雨过天晴", pinyin: "yǔ guò tiān qíng", explanation: "雨后转晴。也比喻政治上由黑暗到光明。" },
+            { word: "晴云秋月", pinyin: "qíng yún qiū yuè", explanation: "晴空飘浮的白云，秋夜皎洁的月亮。比喻人胸襟高洁明朗。" },
+            { word: "月白风清", pinyin: "yuè bái fēng qīng", explanation: "形容幽静美好的夜晚。" },
+            { word: "清规戒律", pinyin: "qīng guī jiè lǜ", explanation: "原指佛教徒所遵守的规则和戒条。现比喻束缚人的繁琐不合理的规章制度。" },
+            { word: "律人律己", pinyin: "lǜ rén lǜ jǐ", explanation: "约束别人，约束自己。" },
+            { word: "己溺己饥", pinyin: "jǐ nì jǐ jī", explanation: "视人民的疾苦是由自己所造成，因此解除他们的痛苦是自己不可推卸的责任。" },
+            { word: "饥不择食", pinyin: "jī bù zé shí", explanation: "择：挑拣。不管什么都吃。比喻需要急迫，顾不得选择。" },
+            { word: "食不果腹", pinyin: "shí bù guǒ fù", explanation: "果：充实，饱。指吃不饱肚子。形容生活贫困。" },
+            { word: "腹背受敌", pinyin: "fù bèi shòu dí", explanation: "腹：指前面；背：指后面。前后受到敌人的夹攻。" },
+            { word: "敌忾同仇", pinyin: "dí kài tóng chóu", explanation: "同仇：共同对敌；敌忾：对敌人的愤怒。指全体一致痛恨敌人。" },
+            { word: "仇深似海", pinyin: "chóu shēn sì hǎi", explanation: "形容仇恨极深。" },
+            { word: "海枯石烂", pinyin: "hǎi kū shí làn", explanation: "海水干涸、石头腐烂。形容历时久远，比喻坚定的意志永远不变。" },
+            { word: "烂醉如泥", pinyin: "làn zuì rú ní", explanation: "醉得瘫成一团，扶都扶不住。形容大醉的样子。" },
+            { word: "泥牛入海", pinyin: "ní niú rù hǎi", explanation: "泥塑的牛掉到海里。比喻一去不再回来。" },
+            { word: "海阔天空", pinyin: "hǎi kuò tiān kōng", explanation: "象大海一样辽阔，象天空一样无边无际。形容大自然的广阔。比喻想象或说话毫无拘束地。" },
+            { word: "空穴来风", pinyin: "kōng xué lái fēng", explanation: "穴：孔、洞；来：招致。有了洞穴才进风。比喻消息和谣言的传播不是完全没有原因的。也比喻流言乘机会传开来。" },
+            { word: "风花雪月", pinyin: "fēng huā xuě yuè", explanation: "原指旧时诗文里经常描写的自然景物。后比喻堆砌词藻、内容贫乏空洞的诗文。也指爱情之事或花天酒地的荒淫生活。" },
+            { word: "月黑风高", pinyin: "yuè hēi fēng gāo", explanation: "比喻没有月光风也很大的夜晚。比喻险恶的环境。" },
+            { word: "高朋满座", pinyin: "gāo péng mǎn zuò", explanation: "高：高贵。高贵的朋友坐满了席位。形容宾客很多。" },
+            { word: "座无虚席", pinyin: "zuò wú xū xí", explanation: "虚：空。座位没有空着的。形容出席的人很多。" },
+            { word: "席不暇暖", pinyin: "xí bù xiá nuǎn", explanation: "席：坐席；暇：空闲。连席子还没有来得及坐热就起来了。原指东奔西走，不得安居。后形容很忙，多坐一会儿的时间都没有。" },
+            { word: "暖衣饱食", pinyin: "nuǎn yī bǎo shí", explanation: "形容生活宽裕，衣食丰足。" },
+            { word: "食言而肥", pinyin: "shí yán ér féi", explanation: "食言：失信。指不守信用，只图自己占便宜。" },
+            { word: "肥头大耳", pinyin: "féi tóu dà ěr", explanation: "一个肥胖的脑袋，两只大耳朵。形容体态肥胖，有时指小孩可爱。" },
+            { word: "耳聪目明", pinyin: "ěr cōng mù míng", explanation: "聪：听觉灵敏；明：眼力敏锐。听得清楚，看得明白。形容头脑清楚，眼光敏锐。" },
+            { word: "明哲保身", pinyin: "míng zhé bǎo shēn", explanation: "明智的人善于保全自己。现指因怕连累自己而回避原则斗争的处世态度。" },
+            { word: "身败名裂", pinyin: "shēn bài míng liè", explanation: "身：身分，地位；败：毁坏；裂：破损。地位丧失，名誉扫地。指做坏事而遭到彻底失败。" },
+            { word: "裂石穿云", pinyin: "liè shí chuān yún", explanation: "震开山石，透过云霄。形容声音高亢嘹亮。" },
+            { word: "云游四海", pinyin: "yún yóu sì hǎi", explanation: "像行云一样在四海漫游，行踪不定。" },
+            { word: "海枯见底", pinyin: "hǎi kū jiàn dǐ", explanation: "海枯：海水干涸。海水干涸之后终究可以看见海底。比喻人心思终可测度。" },
+            { word: "底里深情", pinyin: "dǐ lǐ shēn qíng", explanation: "事情的真实情况与缘由。" },
+            { word: "情窦初开", pinyin: "qíng dòu chū kāi", explanation: "指刚刚懂得爱情（多指少女）。" },
+            { word: "开卷有益", pinyin: "kāi juàn yǒu yì", explanation: "开卷：打开书本，指读书；益：好处。读书总有好处。" },
+            { word: "益国利民", pinyin: "yì guó lì mín", explanation: "对国家、对人民都有利。" },
+            { word: "民不聊生", pinyin: "mín bù liáo shēng", explanation: "聊：依赖，凭借。指老百姓无以为生，活不下去。" },
+            { word: "生搬硬套", pinyin: "shēng bān yìng tào", explanation: "生：生硬。指不顾实际情况，机械地运用别人的经验，照抄别人的办法。" },
+            { word: "套言不叙", pinyin: "tào yán bù xù", explanation: "套话不多说了。" },
+            { word: "叙功论赏", pinyin: "xù gōng lùn shǎng", explanation: "按功劳的大小给予奖赏。" },
+            { word: "赏罚分明", pinyin: "shǎng fá fēn míng", explanation: "该赏的赏，该罚的罚。形容处理事情严格而公正。" },
+            { word: "明察秋毫", pinyin: "míng chá qiū háo", explanation: "明察：看清；秋毫：秋天鸟兽身上新长的细毛。原形容人目光敏锐，任何细小的事物都能看得很清楚。后多形容人能洞察事理。" },
+            { word: "毫厘不爽", pinyin: "háo lí bù shuǎng", explanation: "毫：细毛；发：头发；爽：差错。形容一点不差。" },
+            { word: "爽然若失", pinyin: "shuǎng rán ruò shī", explanation: "爽然：主意不定的样子；若失：象失去依靠。形容心中无主、空虚怅惘的神态。" },
+            { word: "失道寡助", pinyin: "shī dào guǎ zhù", explanation: "道：道义；寡：少。做事违反正义的人，一定得不到别人的支持和帮助。" },
+            { word: "助边输财", pinyin: "zhù biān shū cái", explanation: "边：边防；输：捐献。捐献财物作巩固边防的费用。" },
+            { word: "财大气粗", pinyin: "cái dà qì cū", explanation: "①指富有财产，气派不凡。②指仗着钱财多而气势凌人。" },
+            { word: "粗枝大叶", pinyin: "cū zhī dà yè", explanation: "绘画，画树木粗枝大叶，不用工笔。比喻工作粗糙，不认真细致。" },
+            { word: "叶公好龙", pinyin: "yè gōng hào lóng", explanation: "叶公：春秋时楚国贵族，名子高，封于叶（古邑名，今河南叶县）。比喻口头上说爱好某事物，实际上并不真爱好。" },
+            { word: "龙争虎斗", pinyin: "lóng zhēng hǔ dòu", explanation: "比喻势均力敌的双方之间，斗争或竞赛十分激烈。" },
+            { word: "斗转星移", pinyin: "dǒu zhuǎn xīng yí", explanation: "星斗变动位置。指季节或时间的变化。" },
+            { word: "移花接木", pinyin: "yí huā jiē mù", explanation: "把一种花木的枝条或嫩芽嫁接在另一种花木上。比喻暗中用手段更换人或事物来欺骗别人。" },
+            { word: "木已成舟", pinyin: "mù yǐ chéng zhōu", explanation: "树木已经做成了船。比喻事情已成定局，无法改变。" },
+            { word: "舟中敌国", pinyin: "zhōu zhōng dí guó", explanation: "同船的人都成的敌人。比喻大家反对，十分孤立。" },
+            { word: "国色天香", pinyin: "guó sè tiān xiāng", explanation: "原形容颜色和香气不同于一般花卉的牡丹花。后也形容女子的美丽。" },
+            { word: "香火因缘", pinyin: "xiāng huǒ yīn yuán", explanation: "香火：供佛敬神时燃点的香和灯火。香和灯火都是供佛的，因此佛教称彼此意志相投为“香火因缘”。指彼此契合。" },
+            { word: "缘木求鱼", pinyin: "yuán mù qiú yú", explanation: "缘木：爬树。爬到树上去找鱼。比喻方向或办法不对头，不可能达到目的。" },
+            { word: "鱼贯而入", pinyin: "yú guàn ér rù", explanation: "象游鱼一样一个跟着一个地接连着走。形容一个接一个地依次序进入。" },
+            { word: "入木三分", pinyin: "rù mù sān fēn", explanation: "相传王羲之在木板上写字，木工刻时，发现字迹透入木板三分深。形容书法极有笔力。现多比喻分析问题很深刻。" },
+            { word: "分道扬镳", pinyin: "fēn dào yáng biāo", explanation: "分路而行。比喻目标不同，各走各的路或各干各的事。" },
+            { word: "镳尘警露", pinyin: "biāo chén jǐng lù", explanation: "车马驰驱，尘土蔽天，以警行旅。谓行旅的辛苦。" },
+            { word: "露胆披肝", pinyin: "lù dǎn pī gān", explanation: "披露肝胆。比喻待人坦诚之至。" },
+            { word: "肝脑涂地", pinyin: "gān nǎo tú dì", explanation: "涂地：涂抹在地上。形容惨死。也形容竭尽忠诚，任何牺牲都在所不惜。" },
+            { word: "地大物博", pinyin: "dì dà wù bó", explanation: "博：丰富。指国家疆土辽阔，资源丰富。" },
+            { word: "博闻强识", pinyin: "bó wén qiáng zhì", explanation: "闻：见闻。形容知识丰富，记忆力强。" },
+            { word: "识文断字", pinyin: "shí wén duàn zì", explanation: "识字。指有一点文化知识。" },
+            { word: "字斟句酌", pinyin: "zì zhēn jù zhuó", explanation: "斟、酌：反复考虑。指写文章或说话时慎重细致，一字一句地推敲琢磨。" },
+            { word: "酌盈剂虚", pinyin: "zhuó yíng jì xū", explanation: "拿多余的弥补不足的或亏损的。" },
+            { word: "虚与委蛇", pinyin: "xū yǔ wēi yí", explanation: "虚：假；委蛇：随便应顺。指对人虚情假意，敷衍应酬。" },
+            { word: "蛇蝎心肠", pinyin: "shé xiē xīn cháng", explanation: "蝎：一种蜘蛛类的毒虫。形容心肠狠毒。" },
+            { word: "肠肥脑满", pinyin: "cháng féi nǎo mǎn", explanation: "肠肥：指身体胖，肚子大；脑满：指肥头大耳。形容不劳而食的人吃得饱饱的，养得胖胖的。" },
+            { word: "满袖春风", pinyin: "mǎn xiù chūn fēng", explanation: "衣袖飘曳生风。形容十分得意。" },
+            { word: "风驰电掣", pinyin: "fēng chí diàn chè", explanation: "驰：奔跑；掣：闪过。形容非常迅速，像风吹电闪一样。" },
+            { word: "掣襟露肘", pinyin: "chè jīn lù zhǒu", explanation: "掣：牵接。接一下衣襟胳膊肘儿就露出来。形容衣服破烂，生活贫困。" },
+            { word: "肘腋之患", pinyin: "zhǒu yè zhī huàn", explanation: "肘腋：胳膊肘和夹肢窝，比喻极近的地方。产生于身边的祸患。" },
+            { word: "患得患失", pinyin: "huàn dé huàn shī", explanation: "患：忧患，担心。担心得不到，得到了又担心失掉。形容对个人得失看得很重。" },
+            { word: "失之交臂", pinyin: "shī zhī jiāo bì", explanation: "交臂：胳膊碰胳膊，指擦肩而过。形容当面错过。" },
+            { word: "臂有四肘", pinyin: "bì yǒu sì zhǒu", explanation: "比喻不凡的相貌。" },
+            { word: "肘行膝步", pinyin: "zhǒu xíng xī bù", explanation: "匍匐前行，表示虔诚或哀戚。" },
+            { word: "步人后尘", pinyin: "bù rén hòu chén", explanation: "后尘：走路或行车时后面扬起的尘土。指跟在人家后面走。比喻追随模仿，学人家的样子，没有创造性。" },
+            { word: "尘饭涂羹", pinyin: "chén fàn tú gēng", explanation: "涂：泥。尘做的饭，泥做的羹。指儿童游戏。比喻没有用处的东西。" },
+            { word: "羹藜含糗", pinyin: "gēng lí hán qiǔ", explanation: "藜：野菜。泛指饮食粗劣。" },
+            { word: "糗粮藉寇", pinyin: "qiǔ liáng jiè kòu", explanation: "糗粮：干粮；藉：借；寇：贼寇。指借给敌寇粮食。" },
+            { word: "寇不可玩", pinyin: "kòu bù kě wán", explanation: "寇：盗贼；玩：习惯而不留心。对于盗贼不能放松警惕。" },
+            { word: "玩物丧志", pinyin: "wán wù sàng zhì", explanation: "玩：玩赏；丧：丧失；志：志气。指迷恋于所玩赏的事物而消磨了积极进取的志气。" },
+            { word: "志坚行苦", pinyin: "zhì jiān xíng kǔ", explanation: "行：行为。指意志坚定，行为刻苦。" },
+            { word: "苦口婆心", pinyin: "kǔ kǒu pó xīn", explanation: "苦口：反复规劝；婆心：仁慈的心肠。善意的又不厌其烦地劝导某人。" },
+            { word: "心花怒放", pinyin: "xīn huā nù fàng", explanation: "怒放：盛开。心里高兴得像花儿盛开一样。形容极其高兴。" },
+            { word: "放浪形骸", pinyin: "fàng làng xíng hái", explanation: "放浪：放荡；形骸：人的形体。指行动不受世俗礼节的束缚。" },
+            { word: "骸鼻汤", pinyin: "hái bí tāng", explanation: "中医方剂名。" },
+            { word: "汤里来，水里去", pinyin: "tāng lǐ lái, shuǐ lǐ qù", explanation: "指银钱随手来随手去，留不住。" },
+            { word: "去伪存真", pinyin: "qù wěi cún zhēn", explanation: "除掉虚假的，留下真实的。" },
+            { word: "真才实学", pinyin: "zhēn cái shí xué", explanation: "真正的才能和学问。" },
+            { word: "学富五车", pinyin: "xué fù wǔ chē", explanation: "五车：指五车书。形容读书多，学识丰富。" },
+            { word: "车水马龙", pinyin: "chē shuǐ mǎ lóng", explanation: "车象流水，马象游龙。形容来往车马很多，连续不断的热闹情景。" },
+            { word: "龙跃凤鸣", pinyin: "lóng yuè fèng míng", explanation: "象龙在腾跃，凤凰在高鸣。比喻才华出众。" },
+            { word: "鸣金收兵", pinyin: "míng jīn shōu bīng", explanation: "用敲锣等发出信号撤兵回营。比喻战斗暂时结束。" },
+            { word: "兵贵神速", pinyin: "bīng guì shén sù", explanation: "神速：特别迅速。用兵贵在行动特别迅速。" },
+            { word: "速战速决", pinyin: "sù zhàn sù jué", explanation: "用快速的战术结束战局。也比喻用迅速的办法完成任务。" },
+            { word: "决一死战", pinyin: "jué yī sǐ zhàn", explanation: "决：决定；死：拼死。对敌人拼死决战。" },
+            { word: "战天斗地", pinyin: "zhàn tiān dòu dì", explanation: "战、斗：泛指斗争。形容征服和改造大自然的英雄气慨。" },
+            { word: "地动山摇", pinyin: "dì dòng shān yáo", explanation: "地震发生时大地颤动，山河摇摆。亦形容声势浩大或斗争激烈。" },
+            { word: "摇旗呐喊", pinyin: "yáo qí nà hǎn", explanation: "原指古代作战时摇着旗子，大声喊杀助威。现比喻给别人助长声势。" },
+            { word: "喊冤叫屈", pinyin: "hǎn yuān jiào qū", explanation: "为遭受冤屈而喊叫。" },
+            { word: "屈打成招", pinyin: "qū dǎ chéng zhāo", explanation: "屈：冤枉；招：招供。指无罪的人冤枉受刑，被迫招认有罪。" },
+            { word: "招贤纳士", pinyin: "zhāo xián nà shì", explanation: "招：招收；贤：有德有才的人；纳：接受；士：指读书人。招收贤士，接纳书生。指网罗人才。" },
+            { word: "士饱马腾", pinyin: "shì bǎo mǎ téng", explanation: "军粮充足，士气旺盛。" },
+            { word: "腾云驾雾", pinyin: "téng yún jià wù", explanation: "乘着云，驾着雾。原是传说中指会法术的人乘云雾飞行，后形容奔驰迅速或头脑发昏。" },
+            { word: "雾里看花", pinyin: "wù lǐ kàn huā", explanation: "原形容年老视力差，看东西模糊，后也比喻看事情不真切。" },
+            { word: "花团锦簇", pinyin: "huā tuán jǐn cù", explanation: "锦：有文彩的丝织品；簇：丛聚。形容五彩缤纷，十分鲜艳多彩的景象。也形容文章辞藻华丽。" },
+            { word: "簇锦团花", pinyin: "cù jǐn tuán huā", explanation: "簇：聚成团。锦：有花纹的丝织品。形容五色缤纷，繁华艳丽的景象。" },
+            { word: "花红柳绿", pinyin: "huā hóng liǔ lǜ", explanation: "形容明媚的春天景象。也形容颜色鲜艳纷繁。" },
+            { word: "绿林好汉", pinyin: "lù lín hǎo hàn", explanation: "指聚集山林反抗封建统治阶级的人们。旧时也指聚众行劫的群盗股匪。" },
+            { word: "汉官威仪", pinyin: "hàn guān wēi yí", explanation: "原指汉朝官吏的服饰制度。后常指汉族的统治制度。" },
+            { word: "仪表堂堂", pinyin: "yí biǎo táng táng", explanation: "仪表：人的外表，风度；堂堂：仪容庄严大方的样子。形容人的容貌端正。" },
+            { word: "堂而皇之", pinyin: "táng ér huáng zhī", explanation: "堂皇：官署的大堂，引申为气势盛大的样子。形容端正庄严或雄伟有气派。也指表面上庄严正大，堂堂正正，实际却不然。" },
+            { word: "之乎者也", pinyin: "zhī hū zhě yě", explanation: "这四个字都是文言虚词，讽刺人说话喜欢咬文嚼字。也形容半文不白的话或文章。" },
+            { word: "也里可温", pinyin: "yě lǐ kě wēn", explanation: "元代称天主教徒和教士为也里可温。" },
+            { word: "温故知新", pinyin: "wēn gù zhī xīn", explanation: "温：温习；故：旧的。温习旧的知识，得到新的理解和体会。也指回忆过去，能更好地认识现在。" },
+            { word: "新仇旧恨", pinyin: "xīn chóu jiù hèn", explanation: "新仇加旧恨。形容仇恨深。" },
+            { word: "恨之入骨", pinyin: "hèn zhī rù gǔ", explanation: "恨到骨头里去。形容痛恨到极点。" },
+            { word: "骨瘦如柴", pinyin: "gǔ shòu rú chái", explanation: "形容消瘦到极点。" },
+            { word: "柴米油盐", pinyin: "chái mǐ yóu yán", explanation: "泛指一日三餐的生活必需品。" },
+            { word: "盐梅相成", pinyin: "yán méi xiāng chéng", explanation: "盐味与酸味相调和。比喻济世的贤臣。" },
+            { word: "成人之美", pinyin: "chéng rén zhī měi", explanation: "成：成就。成全别人的好事。" },
+            { word: "美中不足", pinyin: "měi zhōng bù zú", explanation: "大体很好，但还有不足。" },
+            { word: "足智多谋", pinyin: "zú zhì duō móu", explanation: "足：充实，足够；智：聪明、智慧；谋：计谋。富有智慧，善于谋划。形容人善于料事和用计。" },
+            { word: "谋财害命", pinyin: "móu cái hài mìng", explanation: "为了劫夺财物，害人性命。" },
+            { word: "命在旦夕", pinyin: "mìng zài dàn xī", explanation: "旦夕：早晚之间，形容极短的时间。生命垂危，很快会失去生命。" },
+            { word: "夕惕朝乾", pinyin: "xī tì zhāo qián", explanation: "指终日勤谨慎惧，不敢懈怠。" },
+            { word: "乾端坤倪", pinyin: "qián duān kūn ní", explanation: "指天地显示的征兆。" },
+            { word: "倪宽赞", pinyin: "ní kuān zàn", explanation: "唐代书法家褚遂良的楷书作品。" },
+            { word: "赞不绝口", pinyin: "zàn bù jué kǒu", explanation: "不住口地称赞。" },
+            { word: "口蜜腹剑", pinyin: "kǒu mì fù jiàn", explanation: "嘴上说的很甜美，凡里却怀着害人的主意。形容两面派的狡猾阴险。" },
+            { word: "剑胆琴心", pinyin: "jiàn dǎn qín xīn", explanation: "比喻既有情致，又有胆识（旧小说多用来形容能文能武的才子）。" },
+            { word: "心荡神迷", pinyin: "xīn dàng shén mí", explanation: "荡：摇动。形容心神不定，难以自持。" },
+            { word: "迷而不返", pinyin: "mí ér bù fǎn", explanation: "迷路后不知回来。比喻犯了错误不知改正。" },
+            { word: "返老还童", pinyin: "fǎn lǎo huán tóng", explanation: "由衰老恢复青春。形容老年人充满了活力。" },
+            { word: "童叟无欺", pinyin: "tóng sǒu wú qī", explanation: "既不欺骗小孩也不欺骗老人。指买卖公平。" },
+            { word: "欺上瞒下", pinyin: "qī shàng mán xià", explanation: "对上欺骗，博取信任；对下隐瞒，掩盖真相。" },
+            { word: "下里巴人", pinyin: "xià lǐ bā rén", explanation: "原指战国时代楚国民间流行的一种歌曲。比喻通俗的文学艺术。" },
+            { word: "人定胜天", pinyin: "rén dìng shèng tiān", explanation: "人定：指人谋。指人力能够战胜自然。" }
+        ];
+
+        // 游戏状态
+        const gameState = {
+            currentLevel: null,
+            targetCount: 0,
+            completedCount: 0,
+            currentIdiom: null,
+            usedIdioms: new Set(),
+            timer: null,
+            seconds: 0
+        };
+
+        // DOM 元素
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const successResult = document.getElementById('success-result');
+        const failResult = document.getElementById('fail-result');
+        const easyBtn = document.getElementById('easy-btn');
+        const mediumBtn = document.getElementById('medium-btn');
+        const hardBtn = document.getElementById('hard-btn');
+        const userInput = document.getElementById('user-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const exitBtn = document.getElementById('exit-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const currentIdiomEl = document.getElementById('current-idiom');
+        const firstCharacterEl = document.getElementById('first-character');
+        const idiomHistory = document.getElementById('idiom-history');
+        const feedback = document.getElementById('feedback');
+        const progressBar = document.getElementById('progress-bar');
+        const completedCountEl = document.getElementById('completed-count');
+        const totalCountEl = document.getElementById('total-count');
+        const currentLevelEl = document.getElementById('current-level');
+        const timerEl = document.getElementById('timer');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const selectLevelBtn = document.getElementById('select-level-btn');
+        const tryAgainBtn = document.getElementById('try-again-btn');
+        const backBtn = document.getElementById('back-btn');
+        const resultLevelEl = document.getElementById('result-level');
+        const resultTimeEl = document.getElementById('result-time');
+        const failLevelEl = document.getElementById('fail-level');
+        const failTimeEl = document.getElementById('fail-time');
+
+        // 随机获取一个成语
+        function getRandomIdiom() {
+            const randomIndex = Math.floor(Math.random() * idiomDatabase.length);
+            return idiomDatabase[randomIndex];
+        }
+
+        // 获取以指定字符开头的成语
+        function getMatchingIdioms(character) {
+            return idiomDatabase.filter(idiom => 
+                idiom.word.charAt(0) === character && 
+                !gameState.usedIdioms.has(idiom.word)
+            );
+        }
+
+        // 格式化时间
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 更新计时器
+        function updateTimer() {
+            gameState.seconds++;
+            timerEl.textContent = formatTime(gameState.seconds);
+        }
+
+        // 开始游戏
+        function startGame(level) {
+            // 设置游戏级别
+            gameState.currentLevel = level;
+            if (level === 'easy') {
+                gameState.targetCount = 6;
+                currentLevelEl.textContent = '简单模式';
+                resultLevelEl.textContent = '简单';
+                failLevelEl.textContent = '简单';
+            } else if (level === 'medium') {
+                gameState.targetCount = 10;
+                currentLevelEl.textContent = '中等模式';
+                resultLevelEl.textContent = '中等';
+                failLevelEl.textContent = '中等';
+            } else {
+                gameState.targetCount = 14;
+                currentLevelEl.textContent = '困难模式';
+                resultLevelEl.textContent = '困难';
+                failLevelEl.textContent = '困难';
+            }
+            
+            // 重置游戏状态
+            gameState.completedCount = 0;
+            gameState.seconds = 0;
+            gameState.usedIdioms.clear();
+            
+            // 获取第一个成语
+            gameState.currentIdiom = getRandomIdiom();
+            gameState.usedIdioms.add(gameState.currentIdiom.word);
+            
+            // 更新UI
+            currentIdiomEl.textContent = gameState.currentIdiom.word;
+            firstCharacterEl.textContent = gameState.currentIdiom.word.charAt(3);
+            completedCountEl.textContent = gameState.completedCount;
+            totalCountEl.textContent = gameState.targetCount;
+            progressBar.style.width = '0%';
+            idiomHistory.innerHTML = '';
+            userInput.value = '';
+            userInput.focus();
+            timerEl.textContent = '00:00';
+            
+            // 切换屏幕
+            welcomeScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            // 启动计时器
+            if (gameState.timer) clearInterval(gameState.timer);
+            gameState.timer = setInterval(updateTimer, 1000);
+        }
+
+        // 检查成语是否正确
+        function checkIdiom() {
+            const userAnswer = userInput.value.trim();
+            
+            // 检查是否为空
+            if (!userAnswer) {
+                showFeedback('请输入一个成语！', 'error');
+                return;
+            }
+            
+            // 检查是否是四字成语
+            if (userAnswer.length !== 4) {
+                showFeedback('请输入一个四字成语！', 'error');
+                return;
+            }
+            
+            // 检查是否已使用过
+            if (gameState.usedIdioms.has(userAnswer)) {
+                showFeedback('这个成语已经使用过了！', 'error');
+                return;
+            }
+            
+            // 检查是否存在于成语库中
+            const idiomExists = idiomDatabase.some(idiom => idiom.word === userAnswer);
+            if (!idiomExists) {
+                showFeedback('这不是一个有效的成语！', 'error');
+                return;
+            }
+            
+            // 检查是否以指定字开头
+            const requiredChar = gameState.currentIdiom.word.charAt(3);
+            if (userAnswer.charAt(0) !== requiredChar) {
+                showFeedback(`这个成语不是以"${requiredChar}"开头的！`, 'error');
+                return;
+            }
+            
+            // 成语正确，更新游戏状态
+            gameState.completedCount++;
+            gameState.usedIdioms.add(userAnswer);
+            
+            // 更新UI
+            addToHistory(gameState.currentIdiom.word, true);
+            addToHistory(userAnswer, false);
+            completedCountEl.textContent = gameState.completedCount;
+            const progress = (gameState.completedCount / gameState.targetCount) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // 检查是否完成游戏
+            if (gameState.completedCount >= gameState.targetCount) {
+                clearInterval(gameState.timer);
+                showResult(true);
+                return;
+            }
+            
+            // 更新当前成语
+            const matchingIdioms = getMatchingIdioms(userAnswer.charAt(3));
+            if (matchingIdioms.length === 0) {
+                // 没有可用的成语，游戏结束
+                clearInterval(gameState.timer);
+                showResult(false);
+                return;
+            }
+            
+            // 随机选择一个新成语
+            const randomIndex = Math.floor(Math.random() * matchingIdioms.length);
+            gameState.currentIdiom = matchingIdioms[randomIndex];
+            
+            // 更新UI
+            currentIdiomEl.textContent = gameState.currentIdiom.word;
+            firstCharacterEl.textContent = gameState.currentIdiom.word.charAt(3);
+            userInput.value = '';
+            userInput.focus();
+            showFeedback('回答正确！继续加油！', 'success');
+        }
+
+        // 显示反馈信息
+        function showFeedback(message, type) {
+            feedback.textContent = message;
+            feedback.className = type === 'success' 
+                ? 'bg-green-100 text-green-700 p-4 rounded-lg' 
+                : 'bg-red-100 text-red-700 p-4 rounded-lg';
+            feedback.classList.remove('hidden');
+            
+            // 3秒后隐藏反馈
+            setTimeout(() => {
+                feedback.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 添加到历史记录
+        function addToHistory(idiom, isPrevious) {
+            const item = document.createElement('div');
+            item.className = isPrevious 
+                ? 'bg-primary/10 text-primary p-3 rounded-lg text-center shadow-sm bounce-in'
+                : 'bg-secondary/10 text-secondary p-3 rounded-lg text-center shadow-sm bounce-in';
+            item.textContent = idiom;
+            idiomHistory.appendChild(item);
+        }
+
+        // 显示结果
+        function showResult(isSuccess) {
+            if (isSuccess) {
+                successResult.classList.remove('hidden');
+                failResult.classList.add('hidden');
+                resultTimeEl.textContent = formatTime(gameState.seconds);
+            } else {
+                successResult.classList.add('hidden');
+                failResult.classList.remove('hidden');
+                failTimeEl.textContent = formatTime(gameState.seconds);
+            }
+            
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+        }
+
+        // 显示提示
+        function showHint() {
+            const character = gameState.currentIdiom.word.charAt(3);
+            const matchingIdioms = getMatchingIdioms(character);
+            
+            if (matchingIdioms.length > 0) {
+                // 随机显示一个提示
+                const randomIndex = Math.floor(Math.random() * matchingIdioms.length);
+                const hintIdiom = matchingIdioms[randomIndex];
+                
+                // 部分显示成语（只显示第一个字和最后一个字）
+                const partialIdiom = hintIdiom.word.charAt(0) + '**' + hintIdiom.word.charAt(3);
+                
+                showFeedback(`提示：以"${character}"开头的成语可以是"${partialIdiom}"`, 'info');
+            } else {
+                showFeedback('没有可用的提示！', 'info');
+            }
+        }
+
+        // 事件监听器
+        easyBtn.addEventListener('click', () => startGame('easy'));
+        mediumBtn.addEventListener('click', () => startGame('medium'));
+        hardBtn.addEventListener('click', () => startGame('hard'));
+        
+        submitBtn.addEventListener('click', checkIdiom);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkIdiom();
+        });
+        
+        exitBtn.addEventListener('click', () => {
+            clearInterval(gameState.timer);
+            gameScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        });
+        
+        hintBtn.addEventListener('click', showHint);
+        
+        playAgainBtn.addEventListener('click', () => startGame(gameState.currentLevel));
+        selectLevelBtn.addEventListener('click', () => {
+            welcomeScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+        });
+        
+        tryAgainBtn.addEventListener('click', () => startGame(gameState.currentLevel));
+        backBtn.addEventListener('click', () => {
+            welcomeScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+        });
+
+        // 页面滚动时添加阴影效果
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow-lg');
+            } else {
+                header.classList.remove('shadow-lg');
+            }
+        });
+    </script>
+</body>
+</html>
+    
